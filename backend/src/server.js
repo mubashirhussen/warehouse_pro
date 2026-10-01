@@ -138,11 +138,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`Warehouse Pro API Server running on port ${PORT}`);
-  console.log(`API Health: http://localhost:${PORT}/api/health`);
-  console.log(`====================================================`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`Warehouse Pro API Server running on port ${PORT}`);
+    console.log(`API Health: http://localhost:${PORT}/api/health`);
+    console.log(`====================================================`);
+  });
+}
 
 module.exports = app;

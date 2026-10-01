@@ -2,7 +2,25 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'db', 'warehouse.db');
+const isVercel = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+
+let dbPath;
+if (isVercel) {
+  dbPath = path.join('/tmp', 'warehouse.db');
+  const sourceDb = path.join(__dirname, '..', 'db', 'warehouse.db');
+  
+  // Copy pre-seeded database to writable /tmp directory if it doesn't exist
+  if (!fs.existsSync(dbPath) && fs.existsSync(sourceDb)) {
+    try {
+      fs.copyFileSync(sourceDb, dbPath);
+      console.log('Copied pre-seeded warehouse.db to /tmp/warehouse.db');
+    } catch (err) {
+      console.error('Error copying database to /tmp:', err);
+    }
+  }
+} else {
+  dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'db', 'warehouse.db');
+}
 
 // Ensure db directory exists
 const dbDir = path.dirname(dbPath);
@@ -14,15 +32,27 @@ const db = new Database(dbPath, {
   verbose: process.env.NODE_ENV === 'development' ? console.log : null
 });
 
-// Enable SQLite WAL mode and foreign key constraints
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+// Configure pragmas for SQLite
+try {
+  if (isVercel) {
+    db.pragma('journal_mode = MEMORY');
+  } else {
+    db.pragma('journal_mode = WAL');
+  }
+  db.pragma('foreign_keys = ON');
+} catch (e) {
+  console.warn('Pragma setup warning:', e.message);
+}
 
 // Initialize schema
 const schemaPath = path.join(__dirname, '..', 'db', 'schema.sql');
 if (fs.existsSync(schemaPath)) {
-  const schema = fs.readFileSync(schemaPath, 'utf8');
-  db.exec(schema);
+  try {
+    const schema = fs.readFileSync(schemaPath, 'utf8');
+    db.exec(schema);
+  } catch (e) {
+    console.warn('Schema exec warning:', e.message);
+  }
 }
 
 // Auto-migrate users columns if created on earlier version
@@ -43,7 +73,7 @@ try {
   }
   db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)').run();
 } catch (e) {
-  // Ignored if table creation is in progress
+  // Ignored
 }
 
 // Helper to log actions into inventory_logs table

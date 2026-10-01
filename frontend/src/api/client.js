@@ -30,7 +30,17 @@ export async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(fullUrl, config);
-    const data = await response.json();
+    const responseText = await response.text();
+    
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (parseErr) {
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status} (${response.statusText}). Please check backend status.`);
+      }
+      throw new Error(`Invalid response received from ${fullUrl}: ${responseText.slice(0, 100)}`);
+    }
 
     if (!response.ok || data.success === false) {
       throw new Error(data.error || `HTTP error ${response.status}: ${response.statusText}`);
