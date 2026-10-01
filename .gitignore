@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Production Builds
+frontend/dist/
+backend/src/public/
+
+# Environment Variables & Logs
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & SQLite Temporary Files (Database schema and seed script populate warehouse.db)
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

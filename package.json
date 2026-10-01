@@ -1,0 +1,31 @@
+{
+  "name": "warehouse-management-system",
+  "version": "1.0.0",
+  "description": "Smart Inventory & Warehouse Management System with React, Node.js, Express, and SQLite",
+  "scripts": {
+    "dev:backend": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "seed": "cd backend && npm run seed",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:frontend",
+    "start": "npm run build && cd backend && npm start",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install-all": "npm run install:backend && npm run install:frontend"
+  },
+  "keywords": [
+    "inventory",
+    "warehouse",
+    "react",
+    "nodejs",
+    "express",
+    "sqlite",
+    "stock-management"
+  ],
+  "author": "Mubashir Husen SK",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

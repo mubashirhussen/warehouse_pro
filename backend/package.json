@@ -1,0 +1,17 @@
+{
+  "name": "warehouse-management-backend",
+  "version": "1.0.0",
+  "description": "Smart Inventory and Warehouse Management System API with SQLite",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node src/db/seed.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
