@@ -1,6 +1,11 @@
-// API Client for WarehousePro
+// API Client for WarehousePro - Universal Local & Production Support
 
-const API_BASE = '/api';
+const envApiUrl = import.meta.env.VITE_API_URL;
+// Normalize base URL without trailing slashes
+const normalizedHost = envApiUrl ? envApiUrl.trim().replace(/\/+$/, '') : '';
+const API_BASE = normalizedHost 
+  ? (normalizedHost.endsWith('/api') ? normalizedHost : `${normalizedHost}/api`) 
+  : '/api';
 
 export async function apiRequest(endpoint, options = {}) {
   const role = localStorage.getItem('warehouse_role') || 'Admin';
@@ -20,8 +25,11 @@ export async function apiRequest(endpoint, options = {}) {
     }
   };
 
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const fullUrl = `${API_BASE}${cleanEndpoint}`;
+
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, config);
+    const response = await fetch(fullUrl, config);
     const data = await response.json();
 
     if (!response.ok || data.success === false) {
@@ -30,7 +38,7 @@ export async function apiRequest(endpoint, options = {}) {
 
     return data;
   } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error.message);
+    console.error(`API Error [${fullUrl}]:`, error.message);
     throw error;
   }
 }
